@@ -15,14 +15,14 @@ void setup() {
 }
 
 void loop() {
-  # Invert reading and decrease reading values
+  // Invert reading and decrease reading values
   int reading = scale.get_units(1) * -0.1;
-  # For debugging purposes, slows readings when not reading serial monitor
-  #Serial.print("Unmapped reading: ");
-  #Serial.println(reading);
-  # Map reading to 0-248, else windows controller reading loops back to 0
+  // For debugging purposes, slows readings when not reading serial monitor
+  //Serial.print("Unmapped reading: ");
+  //Serial.println(reading);
+  // Map reading to 0-248, else windows controller reading loops back to 0
   int readingMapped = map(reading,15000,245000,0,248);
   Joystick.setThrottle(readingMapped);
-  #Serial.print("Mapped reading: ");
-  #Serial.println(readingMapped);
+  //Serial.print("Mapped reading: ");
+  //Serial.println(readingMapped);
 }
