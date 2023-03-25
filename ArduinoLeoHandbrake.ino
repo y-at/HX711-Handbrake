@@ -1,28 +1,35 @@
-#include "Joystick.h"
 #include "HX711.h"
+#include "Joystick.h"
 
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
-
+long reading, mappedReading = 0;
 HX711 scale;
 
 void setup() {
-  Serial.begin(9600);
-  Joystick.begin();
+  Serial.begin(38400);
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  scale.set_scale();    
+  Joystick.begin();
+  scale.set_scale();
   scale.tare();
 }
 
+void sendOutput(long input) {
+    mappedReading = map(input ,9000 ,300000,0,248);
+    if (mappedReading < 0)
+      mappedReading = 0;
+    if (mappedReading > 248)
+      mappedReading = 248;
+    Joystick.setThrottle(mappedReading);
+    //Serial.print(mappedReading);
+    //Serial.print("\n");
+}
+
 void loop() {
-  // Invert reading and decrease reading values
-  int reading = scale.get_units(1) * -0.1;
-  // For debugging purposes, slows readings when not reading serial monitor
-  //Serial.print("Unmapped reading: ");
-  //Serial.println(reading);
-  // Map reading to 0-248, else windows controller reading loops back to 0
-  int readingMapped = map(reading,15000,245000,0,248);
-  Joystick.setThrottle(readingMapped);
-  //Serial.print("Mapped reading: ");
-  //Serial.println(readingMapped);
+  if (scale.is_ready()){
+    reading = scale.get_units();
+    sendOutput(reading);
+    //Serial.print(reading);
+    //Serial.print("\n");
+  }
 }
